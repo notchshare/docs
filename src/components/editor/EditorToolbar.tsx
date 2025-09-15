@@ -127,7 +127,7 @@ export function EditorToolbar() {
   };
 
   return (
-    <div className="flex items-center gap-1 p-2 border-b border-border bg-background sticky top-0 z-10">
+    <div className="flex items-center gap-1 p-2 bg-background sticky top-0 z-10">
       {/* Text Formatting */}
       <div className="flex items-center gap-1">
         <Button

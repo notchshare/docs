@@ -8,9 +8,9 @@ import { EditorCanvas } from '@/components/editor/EditorCanvas';
 export function RichTextEditor() {
   return (
     <EditorProvider>
-      <div className="flex flex-col h-screen bg-gray-50">
+      <div className="flex flex-col h-screen">
         {/* Document Header */}
-        <div className="flex items-center justify-between p-4 bg-white border-b border-border">
+        <div className="flex items-center justify-between p-4 bg-white">
           <div className="flex items-center gap-4">
             <h1 className="text-lg font-semibold">Docs</h1>
             <div className="relative">
@@ -36,7 +36,7 @@ export function RichTextEditor() {
         </div>
 
         {/* Status Bar */}
-        <div className="flex items-center justify-between p-2 bg-white border-t border-border text-xs text-gray-500">
+        <div className="flex items-center justify-between p-2 bg-white text-xs text-gray-500">
           <div className="flex items-center gap-4">
             <span>Words: 0</span>
             <span>Characters: 0</span>

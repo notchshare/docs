@@ -23,7 +23,7 @@ export function EditorCanvas() {
   return (
     <div 
       ref={canvasRef}
-      className="flex-1 max-w-4xl mx-auto p-8 bg-white shadow-sm min-h-[80vh] rounded-lg border border-border"
+      className="flex-1 max-w-4xl mx-auto p-8 min-h-[80vh]"
       style={{
         fontFamily: 'var(--font-sans)'
       }}
