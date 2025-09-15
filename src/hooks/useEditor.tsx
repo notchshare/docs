@@ -1,7 +1,16 @@
 'use client';
 
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
-import { EditorState, EditorAction, Document, TextStyle, Block } from '@/types/editor';
+import { 
+  EditorState, 
+  EditorAction, 
+  Document, 
+  InlineStyle, 
+  Block,
+  createEmptyRichText,
+  insertTextIntoRichContent,
+  applyFormattingToRichContent 
+} from '@/types/editor';
 
 const defaultDocument: Document = {
   id: 'default',
@@ -12,7 +21,7 @@ const defaultDocument: Document = {
     {
       id: 'block-1',
       type: 'paragraph',
-      content: '',
+      content: createEmptyRichText(),
       style: {
         bold: false,
         italic: false,
@@ -32,7 +41,7 @@ const defaultDocument: Document = {
   }
 };
 
-const defaultStyle: TextStyle = {
+const defaultStyle: InlineStyle = {
   bold: false,
   italic: false,
   underline: false,
@@ -122,6 +131,46 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
         ...state,
         cursorPosition: action.payload
       };
+
+    case 'APPLY_FORMATTING': {
+      const { blockId, start, end, style } = action.payload;
+      return {
+        ...state,
+        document: {
+          ...state.document,
+          blocks: state.document.blocks.map(block => {
+            if (block.id === blockId && 'content' in block) {
+              return {
+                ...block,
+                content: applyFormattingToRichContent(block.content, start, end, style)
+              };
+            }
+            return block;
+          }),
+          updatedAt: new Date()
+        }
+      };
+    }
+
+    case 'INSERT_TEXT': {
+      const { blockId, position, text, style } = action.payload;
+      return {
+        ...state,
+        document: {
+          ...state.document,
+          blocks: state.document.blocks.map(block => {
+            if (block.id === blockId && 'content' in block) {
+              return {
+                ...block,
+                content: insertTextIntoRichContent(block.content, position, text, style)
+              };
+            }
+            return block;
+          }),
+          updatedAt: new Date()
+        }
+      };
+    }
 
     default:
       return state;

@@ -13,11 +13,14 @@ export function RichTextEditor() {
         <div className="flex items-center justify-between p-4 bg-white border-b border-border">
           <div className="flex items-center gap-4">
             <h1 className="text-lg font-semibold">Docs</h1>
-            <input
-              type="text"
-              defaultValue="Untitled Document"
-              className="text-base font-medium bg-transparent border-none outline-none focus:bg-gray-50 rounded px-2 py-1"
-            />
+            <div className="relative">
+              <input
+                type="text"
+                defaultValue="Untitled Document"
+                className="text-base font-medium bg-transparent border-none outline-none focus:bg-gray-50 rounded px-2 py-1 min-w-[200px]"
+                placeholder="Document title"
+              />
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-500">Saving...</span>
