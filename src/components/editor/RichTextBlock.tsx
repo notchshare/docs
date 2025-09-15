@@ -134,14 +134,16 @@ export function RichTextBlock({ block }: RichTextBlockProps) {
     const currentText = e.currentTarget.textContent || '';
     const cursorPos = getCursorPosition();
 
-    // Update block content with plain text for now
-    // We'll enhance this to preserve formatting later
+    // For now, update the entire content as a single span with current style
+    // This preserves the basic functionality while we build up the inline formatting
     dispatch({
       type: 'UPDATE_BLOCK',
       payload: {
         id: block.id,
         updates: { 
-          content: createRichTextFromString(currentText, state.currentStyle)
+          content: currentText.length > 0 
+            ? createRichTextFromString(currentText, state.currentStyle)
+            : createEmptyRichText()
         }
       }
     });
@@ -231,8 +233,17 @@ export function RichTextBlock({ block }: RichTextBlockProps) {
     if (!selection || selection.rangeCount === 0) return;
 
     const range = selection.getRangeAt(0);
-    const start = getCursorPosition();
-    const end = start + range.toString().length;
+    
+    // Calculate selection positions relative to the text content
+    const preCaretRange = range.cloneRange();
+    preCaretRange.selectNodeContents(editorRef.current);
+    preCaretRange.setEnd(range.startContainer, range.startOffset);
+    const start = preCaretRange.toString().length;
+    
+    const preSelectionRange = range.cloneRange();
+    preSelectionRange.selectNodeContents(editorRef.current);
+    preSelectionRange.setEnd(range.endContainer, range.endOffset);
+    const end = preSelectionRange.toString().length;
 
     dispatch({
       type: 'SET_SELECTION',
@@ -242,7 +253,13 @@ export function RichTextBlock({ block }: RichTextBlockProps) {
         end: end 
       }
     });
-  }, [block.id, dispatch, getCursorPosition]);
+
+    // Update cursor position
+    dispatch({
+      type: 'SET_CURSOR_POSITION',
+      payload: start
+    });
+  }, [block.id, dispatch]);
 
   // Set up selection change listener
   useEffect(() => {
@@ -259,10 +276,27 @@ export function RichTextBlock({ block }: RichTextBlockProps) {
         state.selectionEnd !== null &&
         state.selectionStart !== state.selectionEnd) {
       
-      // Apply current style to selection when it changes
-      // This will be triggered when user clicks formatting buttons
+      // We have a text selection, so we should apply formatting when style changes
+      const lastStyleKeys = Object.keys(state.currentStyle);
+      const hasStyleChange = lastStyleKeys.some(key => {
+        const styleKey = key as keyof typeof state.currentStyle;
+        return state.currentStyle[styleKey] !== undefined;
+      });
+
+      if (hasStyleChange) {
+        // Apply the current style to the selected range
+        dispatch({
+          type: 'APPLY_FORMATTING',
+          payload: {
+            blockId: block.id,
+            start: state.selectionStart,
+            end: state.selectionEnd,
+            style: state.currentStyle
+          }
+        });
+      }
     }
-  }, [state.currentStyle, state.selectedBlockId, state.selectionStart, state.selectionEnd, block.id]);
+  }, [state.currentStyle, state.selectedBlockId, state.selectionStart, state.selectionEnd, block.id, dispatch]);
 
   return (
     <div className="mb-2">
